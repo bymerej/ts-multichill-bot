@@ -18,7 +18,8 @@ import shutil, socket
 ### start effbot code
 ### source: http://effbot.org/zone/re-sub.htm#unescape-html
 ########################################################
-import re, htmlentitydefs
+#import re, htmlentitydefs
+import htmlentitydefs
 
 ##
 # Removes HTML or XML character references and entities from a text string.
