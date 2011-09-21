@@ -165,7 +165,11 @@ def main(args):
                 wikipedia.output(u'title: %r' % title )
                 wikipedia.output(description)
                 wikipedia.output(u'description: %r' % description )
-                    
+
+                wikipedia.output(u'upload.UploadRobot args: %r' % {'url':sourcefilename.decode(sys.getfilesystemencoding()), 'description':description, 'useFilename':title, 'keepFilename':True, 'verifyDescription':False})
+                wikipedia.output(u'This was a test of the [[Emergency Alert System]]. Bailing.')
+                sys.exit(0)
+
                 bot = upload.UploadRobot(url=sourcefilename.decode(sys.getfilesystemencoding()), description=description, useFilename=title, keepFilename=True, verifyDescription=False)
                 bot.run()
  
