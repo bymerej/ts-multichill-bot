@@ -134,10 +134,13 @@ def main(args):
     #print records
 
     sourcefilenames = glob.glob(workdir + u"/*.TIF")
+    wikipedia.output(u'sourcefilenames: %r' % sourcefilenames )
 
     for sourcefilename in sourcefilenames:
         filename = os.path.basename(sourcefilename)
         # This will give an ugly error if the id is unknown
+
+        wikipedia.output(u'filename: %r' % filename )
         if not records.get(filename):
              wikipedia.output(u'Can\'t find %s in %s. Skipping this file.' % (filename, textfile))
         elif os.path.getsize(sourcefilename) >= 1024 * 1024 * 100:
@@ -155,10 +158,13 @@ def main(args):
                 description = description + categories
 
                 print fileId
+                wikipedia.output(u'fileId: %r' % fileId )
                 title = getTitle(fileId, description)
-                
+
                 wikipedia.output(title)
+                wikipedia.output(u'title: %r' % title )
                 wikipedia.output(description)
+                wikipedia.output(u'description: %r' % description )
                     
                 bot = upload.UploadRobot(url=sourcefilename.decode(sys.getfilesystemencoding()), description=description, useFilename=title, keepFilename=True, verifyDescription=False)
                 bot.run()
