@@ -10,7 +10,7 @@ The bot uses http://toolserver.org/~slakr/archives.php to get the description
 
 import sys, os.path, hashlib, base64, glob, re, urllib, time, unicodedata
 sys.path.append("/Users/Dominic/pywikipedia")
-import wikipedia, config, query, upload
+#import wikipedia, config, query, upload
 import shutil, socket
 
 ########################################################
@@ -61,17 +61,17 @@ def getRecords(textfile):
     return result
 
 
-def findDuplicateImages(filename, site = wikipedia.getSite(u'commons', u'commons')):
-    '''
-    Takes the photo, calculates the SHA1 hash and asks the mediawiki api for a list of duplicates.
-
-    TODO: Add exception handling, fix site thing
-    '''
-    f = open(filename, 'rb')
-
-    hashObject = hashlib.sha1()
-    hashObject.update(f.read(-1))
-    return site.getFilesFromAnHash(base64.b16encode(hashObject.digest()))
+#def findDuplicateImages(filename, site = wikipedia.getSite(u'commons', u'commons')):
+#    '''
+#    Takes the photo, calculates the SHA1 hash and asks the mediawiki api for a list of duplicates.
+#
+#    TODO: Add exception handling, fix site thing
+#    '''
+#    f = open(filename, 'rb')
+#
+#    hashObject = hashlib.sha1()
+#    hashObject.update(f.read(-1))
+#    return site.getFilesFromAnHash(base64.b16encode(hashObject.digest()))
 
 def getDescription(fileId):
     url = u'http://toolserver.org/~slakr/archives.php?archiveHint=%s' % (fileId,)
@@ -93,9 +93,9 @@ def getDescription(fileId):
             else:
                 break
         except IOError:
-            wikipedia.output(u'Got an IOError, let\'s try again')
+            print(u'Got an IOError, let\'s try again')
         except socket.timeout:
-            wikipedia.output(u'Got a timeout, let\'s try again')
+            print(u'Got a timeout, let\'s try again')
 
     if (matches and gotInfo):
         return unescape(matches.group(1))
@@ -152,42 +152,43 @@ def main(args):
     textfile = u''
     records = {}
     
-    site = wikipedia.getSite(u'commons', u'commons')
-    wikipedia.setSite(site)
+    #site = wikipedia.getSite(u'commons', u'commons')
+    #wikipedia.setSite(site)
 
     if not (len(args)==2):
-        wikipedia.output(u'Too few arguments. Usage: NARA_uploader.py <directory> <textfile>')
+        print(u'Too few arguments. Usage: NARA_uploader.py <directory> <textfile>')
         sys.exit()
     
     if os.path.isdir(args[0]):
         workdir = args[0]
     else:
-        wikipedia.output(u'%s doesn\'t appear to be a directory. Exiting' % (args[0],))
+        print(u'%s doesn\'t appear to be a directory. Exiting' % (args[0],))
         sys.exit()
         
     textfile = args[1]
-    records = getRecords(textfile)
+    #records = getRecords(textfile)
+    records = {"19-1065M.TIF": 534596}
     #print records
 
     sourcefilenames = glob.glob(workdir + u"/*.TIF")
-    wikipedia.output(u'sourcefilenames: %r' % sourcefilenames )
+    print(u'sourcefilenames: %r' % sourcefilenames )
 
     for sourcefilename in sourcefilenames:
         filename = os.path.basename(sourcefilename)
         # This will give an ugly error if the id is unknown
 
-        wikipedia.output(u'filename: %r' % filename )
+        print(u'filename: %r' % filename )
         if not records.get(filename):
-             wikipedia.output(u'Can\'t find %s in %s. Skipping this file.' % (filename, textfile))
+             print(u'Can\'t find %s in %s. Skipping this file.' % (filename, textfile))
         elif os.path.getsize(sourcefilename) >= 1024 * 1024 * 100:
-             wikipedia.output(u'%s too big. Skipping this file.' % (sourcefilename,))
+             print(u'%s too big. Skipping this file.' % (sourcefilename,))
         else:
             fileId = records.get(filename)
         
-            duplicates = findDuplicateImages(sourcefilename)
+            #duplicates = findDuplicateImages(sourcefilename)
             duplicates = None
             if duplicates:
-                wikipedia.output(u'Found duplicate image at %s' % duplicates.pop())
+                print(u'Found duplicate image at %s' % duplicates.pop())
             else:
                 # No metadata handling. We use a webtool
                 description = getDescription(fileId)
@@ -195,20 +196,20 @@ def main(args):
                 description = description + categories
 
                 print fileId
-                wikipedia.output(u'fileId: %r' % fileId )
+                print(u'fileId: %r' % fileId )
                 title = getTitle(fileId, description)
 
-                wikipedia.output(title)
-                wikipedia.output(u'title: %r' % title )
-                wikipedia.output(description)
-                wikipedia.output(u'description: %r' % description )
+                print(title)
+                print(u'title: %r' % title )
+                print(description)
+                print(u'description: %r' % description )
 
-                wikipedia.output(u'upload.UploadRobot args: %r' % {'url':sourcefilename.decode(sys.getfilesystemencoding()), 'description':description, 'useFilename':title, 'keepFilename':True, 'verifyDescription':False})
-                wikipedia.output(u'This was a test of the [[Emergency Alert System]]. Bailing.')
+                print(u'upload.UploadRobot args: %r' % {'url':sourcefilename.decode(sys.getfilesystemencoding()), 'description':description, 'useFilename':title, 'keepFilename':True, 'verifyDescription':False})
+                print(u'This was a test of the [[Emergency Alert System]]. Bailing.')
                 sys.exit(0)
 
-                bot = upload.UploadRobot(url=sourcefilename.decode(sys.getfilesystemencoding()), description=description, useFilename=title, keepFilename=True, verifyDescription=False)
-                bot.run()
+                #bot = upload.UploadRobot(url=sourcefilename.decode(sys.getfilesystemencoding()), description=description, useFilename=title, keepFilename=True, verifyDescription=False)
+                #bot.run()
  
 if __name__ == "__main__":
     try:
