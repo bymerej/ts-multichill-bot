@@ -6,9 +6,8 @@ Bot to upload NARA images to Commons.
 The bot expects a directory containing the images on the commandline and a text file containing the mappings.
 
 The bot uses http://toolserver.org/~slakr/archives.php to get the description
-
-
 '''
+
 import sys, os.path, hashlib, base64, glob, re, urllib, time, unicodedata
 sys.path.append("/Users/Dominic/pywikipedia")
 import wikipedia, config, query, upload
