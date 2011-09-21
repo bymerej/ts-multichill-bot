@@ -9,8 +9,8 @@ The bot uses http://toolserver.org/~slakr/archives.php to get the description
 
 
 '''
-import sys, os.path, hashlib, base64, glob, re, urllib, time
-sys.path.append("..\..\pywikipedia")
+import sys, os.path, hashlib, base64, glob, re, urllib, time, unicodedata
+sys.path.append("/Users/Dominic/pywikipedia")
 import wikipedia, config, query, upload
 import shutil, socket
 
@@ -68,9 +68,7 @@ def getDescription(fileId):
 def getTitle(fileId, description):
     titleRe = re.compile('^\|Title=(.+)$', re.MULTILINE)
     titleMatch = titleRe.search(description)
-    titleText = titleMatch.group(1)
-    if len(titleText)>120:
-        titleText = titleText[0 : 120]
+    titleText = truncateWithEllipsis(titleMatch.group(1), 120, "...")
 
     title = u'%s - NARA - %s.tif' % (titleText, fileId)
     return cleanUpTitle(title)
@@ -99,6 +97,16 @@ def cleanUpTitle(title):
     title = re.sub(u"[-,^]([.]|$)", u"\\1", title)
     title = title.replace(u" ", u"_")
     return title
+
+def truncateWithEllipsis(s, limit, ellipsis=u"\u2026"):
+    if len(s) > limit:
+        for i in range(limit, 0, -1):
+            if (unicodedata.category(s[i]) == 'Zs'
+                and i + len(ellipsis) <= limit):
+                return s[:i] + ellipsis
+        return s[:-len(ellipsis)] + ellipsis
+    else:
+        return s
 
 def main(args):
     '''
@@ -132,7 +140,8 @@ def main(args):
         # This will give an ugly error if the id is unknown
         if not records.get(filename):
              wikipedia.output(u'Can\'t find %s in %s. Skipping this file.' % (filename, textfile))
-
+        elif os.path.getsize(sourcefilename) >= 1024 * 1024 * 100:
+             wikipedia.output(u'%s too big. Skipping this file.' % (sourcefilename,))
         else:
             fileId = records.get(filename)
         
@@ -142,9 +151,10 @@ def main(args):
             else:
                 # No metadata handling. We use a webtool
                 description = getDescription(fileId)
-                categories = u'{{Uncategorized-NARA|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}}}\n'
+                categories = u'{{Uncategorized-NARA|year=2011|month=September|day=21}}\n'
                 description = description + categories
 
+                print fileId
                 title = getTitle(fileId, description)
                 
                 wikipedia.output(title)
