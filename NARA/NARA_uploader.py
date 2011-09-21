@@ -99,7 +99,7 @@ def getDescription(fileId):
             wikipedia.output(u'Got a timeout, let\'s try again')
 
     if (matches and gotInfo):
-        return matches.group(1)
+        return unescape(matches.group(1))
     return u''
 
 def getTitle(fileId, description):
