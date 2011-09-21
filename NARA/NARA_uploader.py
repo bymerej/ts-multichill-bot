@@ -149,6 +149,7 @@ def main(args):
             fileId = records.get(filename)
         
             duplicates = findDuplicateImages(sourcefilename)
+            duplicates = None
             if duplicates:
                 wikipedia.output(u'Found duplicate image at %s' % duplicates.pop())
             else:
